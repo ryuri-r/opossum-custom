@@ -408,24 +408,26 @@ function createItemMesh(type) {
             ];
             const c = schemes[variant];
 
-            // 실제 부적 형태: 넓은 상단 + 두 개의 꼭짓점 + 두 다리
+            // 부적 실루엣 트레이스
+            // 상단: 두 뿔 + V노치 / 측면: 넓은 어깨→허리 / 하단: 대각선 두 다리
             const s = new THREE.Shape();
-            s.moveTo(-0.14, 0.12);
-            s.lineTo(-0.08, 0.17);
-            s.lineTo(-0.03, 0.10);
-            s.lineTo(0.03, 0.10);
-            s.lineTo(0.08, 0.17);
-            s.lineTo(0.14, 0.12);
-            s.lineTo(0.17, 0.04);
-            s.lineTo(0.17, -0.01);
-            s.lineTo(0.21, -0.16);
-            s.lineTo(0.13, -0.17);
-            s.lineTo(0.04, -0.06);
-            s.lineTo(-0.04, -0.06);
-            s.lineTo(-0.13, -0.17);
-            s.lineTo(-0.21, -0.16);
-            s.lineTo(-0.17, -0.01);
-            s.lineTo(-0.17, 0.04);
+            s.moveTo(-0.06, 0.21);   // 왼쪽 뿔 끝
+            s.lineTo(0.00, 0.11);    // 상단 V노치 바닥
+            s.lineTo(0.06, 0.21);    // 오른쪽 뿔 끝
+            s.lineTo(0.17, 0.15);    // 오른쪽 어깨 끝
+            s.lineTo(0.19, 0.06);    // 오른쪽 겨드랑이
+            s.lineTo(0.19, -0.01);   // 오른쪽 허리
+            s.lineTo(0.23, -0.13);   // 오른쪽 다리 바깥
+            s.lineTo(0.23, -0.20);   // 오른쪽 다리 끝 바깥
+            s.lineTo(0.14, -0.20);   // 오른쪽 다리 끝 안
+            s.lineTo(0.05, -0.08);   // 가랑이 오른쪽
+            s.lineTo(-0.05, -0.08);  // 가랑이 왼쪽
+            s.lineTo(-0.14, -0.20);  // 왼쪽 다리 끝 안
+            s.lineTo(-0.23, -0.20);  // 왼쪽 다리 끝 바깥
+            s.lineTo(-0.23, -0.13);  // 왼쪽 다리 바깥
+            s.lineTo(-0.19, -0.01);  // 왼쪽 허리
+            s.lineTo(-0.19, 0.06);   // 왼쪽 겨드랑이
+            s.lineTo(-0.17, 0.15);   // 왼쪽 어깨 끝
             s.closePath();
 
             const bodyGeo = new THREE.ExtrudeGeometry(s, { depth: 0.018, bevelEnabled: true, bevelSize: 0.004, bevelThickness: 0.004 });
@@ -448,7 +450,7 @@ function createItemMesh(type) {
             const sclera = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.05, 0.012, 24), scleraMat);
             sclera.rotation.x = Math.PI / 2;
             sclera.scale.x = 1.7;
-            sclera.position.set(0, 0.04, 0.016);
+            sclera.position.set(0, 0.06, 0.016);
             g.add(sclera);
 
             // 홍채
@@ -457,26 +459,26 @@ function createItemMesh(type) {
             const iris = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.014, 20), irisMat);
             iris.rotation.x = Math.PI / 2;
             iris.scale.x = 1.5;
-            iris.position.set(0, 0.04, 0.022);
+            iris.position.set(0, 0.06, 0.022);
             g.add(iris);
 
             // 동공
             const pupilMat = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: 0.1 });
             const pupil = new THREE.Mesh(new THREE.CylinderGeometry(0.016, 0.016, 0.015, 16), pupilMat);
             pupil.rotation.x = Math.PI / 2;
-            pupil.position.set(0, 0.04, 0.028);
+            pupil.position.set(0, 0.06, 0.028);
             g.add(pupil);
 
             // 눈 하이라이트
             const hlMat = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
             const hl = new THREE.Mesh(new THREE.SphereGeometry(0.008, 6, 4), hlMat);
-            hl.position.set(0.012, 0.052, 0.036);
+            hl.position.set(0.012, 0.072, 0.036);
             g.add(hl);
 
             // 눈썹 라인 (윗부분 검은선)
             const browMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
             const brow = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.008, 0.014), browMat);
-            brow.position.set(0, 0.095, 0.016);
+            brow.position.set(0, 0.115, 0.016);
             brow.rotation.z = 0.0;
             g.add(brow);
 
