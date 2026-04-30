@@ -231,8 +231,6 @@ function createOpossum() {
     // 별 모양 귀걸이
     [-1, 1].forEach(side => {
         const charmGroup = new THREE.Group();
-
-        // 8각 별 모양
         const starShape = new THREE.Shape();
         const outerR = 0.07, innerR = 0.03, pts = 8;
         for (let i = 0; i < pts * 2; i++) {
@@ -244,28 +242,21 @@ function createOpossum() {
             else starShape.lineTo(x, y);
         }
         starShape.closePath();
-
         const starGeo = new THREE.ExtrudeGeometry(starShape, { depth: 0.012, bevelEnabled: false });
         const starMat = new THREE.MeshStandardMaterial({ color: 0xFFD700, metalness: 0.4, roughness: 0.2 });
         const star = new THREE.Mesh(starGeo, starMat);
         charmGroup.add(star);
-
-        // 중앙 빨간 고리
         const holeGeo = new THREE.TorusGeometry(0.018, 0.005, 8, 16);
         const holeMat = new THREE.MeshStandardMaterial({ color: 0xFF4400, metalness: 0.5, roughness: 0.3 });
         const hole = new THREE.Mesh(holeGeo, holeMat);
         hole.position.z = 0.006;
         charmGroup.add(hole);
-
-        // 귀와 연결하는 고리
         const hookGeo = new THREE.TorusGeometry(0.018, 0.004, 6, 12);
         const hookMat = new THREE.MeshStandardMaterial({ color: 0xFFD700, metalness: 0.8, roughness: 0.1 });
         const hook = new THREE.Mesh(hookGeo, hookMat);
         hook.position.y = 0.09;
         hook.rotation.x = Math.PI / 2;
         charmGroup.add(hook);
-
-        // 귀 아래 배치, 앞쪽으로 약간 튀어나오게
         charmGroup.position.set(0.55, 0.30, side * 0.30);
         charmGroup.rotation.y = side * 0.3;
         group.headGroup.add(charmGroup);
@@ -408,16 +399,12 @@ function createItemMesh(type) {
         case 'talisman': {
             const g = new THREE.Group();
             const variant = Math.floor(Math.random() * 3);
-
-            // 색상 테마: 0=흰색, 1=빨강, 2=검정
             const schemes = [
                 { body: 0xF5F5F5, accent: 0xCC0000, iris: 0x111111, emissive: null },
                 { body: 0xBB1A00, accent: 0xFFD700, iris: 0x111111, emissive: null },
                 { body: 0x111111, accent: 0xBB0000, iris: 0x44CC00, emissive: 0x226600 },
             ];
             const c = schemes[variant];
-
-            // X자 몸통 (십자 모양을 45도 회전)
             const shape = new THREE.Shape();
             const hw = 0.05, arm = 0.12;
             shape.moveTo(-hw, arm); shape.lineTo(hw, arm);
@@ -425,15 +412,12 @@ function createItemMesh(type) {
             shape.lineTo(hw, -arm); shape.lineTo(-hw, -arm);
             shape.lineTo(-arm, -hw); shape.lineTo(-arm, hw);
             shape.closePath();
-
             const bodyGeo = new THREE.ExtrudeGeometry(shape, { depth: 0.015, bevelEnabled: false });
             const bodyMat = new THREE.MeshStandardMaterial({ color: c.body, roughness: 0.4, metalness: 0.1 });
             const body = new THREE.Mesh(bodyGeo, bodyMat);
             body.rotation.z = Math.PI / 4;
             body.position.z = -0.0075;
             g.add(body);
-
-            // 양쪽 포인트 장식선
             const accentMat = new THREE.MeshStandardMaterial({ color: c.accent, roughness: 0.3, metalness: 0.3 });
             [-0.085, 0.085].forEach((x, i) => {
                 const stripe = new THREE.Mesh(new THREE.BoxGeometry(0.018, 0.1, 0.018), accentMat);
@@ -441,16 +425,12 @@ function createItemMesh(type) {
                 stripe.rotation.z = i === 0 ? -0.45 : 0.45;
                 g.add(stripe);
             });
-
-            // 눈 흰자 (납작한 타원)
             const scleraMat = new THREE.MeshStandardMaterial({ color: 0xFFFFFF, roughness: 0.2 });
             const sclera = new THREE.Mesh(new THREE.CylinderGeometry(0.052, 0.052, 0.01, 20), scleraMat);
             sclera.rotation.x = Math.PI / 2;
             sclera.scale.x = 1.65;
             sclera.position.z = 0.013;
             g.add(sclera);
-
-            // 홍채
             const emissiveOpts = c.emissive ? { emissive: c.emissive, emissiveIntensity: 0.6 } : {};
             const irisMat = new THREE.MeshStandardMaterial({ color: c.iris, roughness: 0.3, ...emissiveOpts });
             const iris = new THREE.Mesh(new THREE.CylinderGeometry(0.032, 0.032, 0.012, 16), irisMat);
@@ -458,20 +438,15 @@ function createItemMesh(type) {
             iris.scale.x = 1.4;
             iris.position.z = 0.019;
             g.add(iris);
-
-            // 동공
             const pupilMat = new THREE.MeshStandardMaterial({ color: 0x000000, roughness: 0.1 });
             const pupil = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.013, 12), pupilMat);
             pupil.rotation.x = Math.PI / 2;
             pupil.position.z = 0.026;
             g.add(pupil);
-
-            // 눈 하이라이트
             const hlMat = new THREE.MeshBasicMaterial({ color: 0xFFFFFF });
             const hl = new THREE.Mesh(new THREE.SphereGeometry(0.009, 6, 4), hlMat);
             hl.position.set(0.013, 0.013, 0.033);
             g.add(hl);
-
             mesh = g;
             break;
         }
@@ -842,4 +817,157 @@ function animate() {
         item.mesh.rotation.y += item.rotSpeed.y * delta;
         item.mesh.rotation.z += item.rotSpeed.z * delta;
 
-       
+        if (t >= 1) {
+            item.done = true;
+            item.fadeOut = true;
+            // Trigger reaction
+            opossumJumping = true;
+            opossumJumpTime = 0;
+            showReaction(item.type);
+
+            if (item.type === 'banana') {
+                fatness += 0.15;
+            }
+            if (item.type === 'talisman') {
+                fatness = Math.max(1.0, fatness - 0.25);
+            }
+
+            if (currentScene === 'bathroom') {
+                for (let j = 0; j < 10; j++) createBubble();
+            }
+        }
+    }
+
+    // Update Bubbles
+    for (let i = bubbles.length - 1; i >= 0; i--) {
+        const b = bubbles[i];
+        b.mesh.position.add(b.velocity);
+        b.life -= delta * 0.5;
+        b.mesh.scale.setScalar(Math.max(0, b.life));
+        if (b.life <= 0) {
+            scene.remove(b.mesh);
+            bubbles.splice(i, 1);
+        }
+    }
+
+    // Update Water Particles
+    if (isPouringWater && currentScene === 'bathroom') {
+        for (let i = 0; i < 3; i++) createWaterParticle();
+    }
+
+    for (let i = waterParticles.length - 1; i >= 0; i--) {
+        const p = waterParticles[i];
+        p.velocity.y -= 0.01; // gravity
+        p.mesh.position.add(p.velocity);
+        p.life -= delta * 0.8;
+        if (p.mesh.position.y < 0.8 && currentScene === 'bathroom') {
+            // Hit water/opossum area
+            if (Math.random() > 0.8) createBubble();
+            scene.remove(p.mesh);
+            waterParticles.splice(i, 1);
+        } else if (p.life <= 0) {
+            scene.remove(p.mesh);
+            waterParticles.splice(i, 1);
+        }
+    }
+
+    // Update Blood
+    for (let i = bloodParticles.length - 1; i >= 0; i--) {
+        const b = bloodParticles[i];
+        b.velocity.y -= 0.01;
+        b.mesh.position.add(b.velocity);
+        b.life -= delta * 1.5;
+        b.mesh.scale.setScalar(Math.max(0, b.life));
+        if (b.life <= 0) {
+            scene.remove(b.mesh);
+            bloodParticles.splice(i, 1);
+        }
+    }
+
+    // Gentle camera sway
+    camera.position.x = Math.sin(time * 0.3) * 0.15;
+    camera.lookAt(0, 1.2, 0);
+
+    renderer.render(scene, camera);
+}
+
+// ===== Resize =====
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+// ===== Hide Loading =====
+setTimeout(() => {
+    document.getElementById('loading-screen').classList.add('hidden');
+}, 800);
+
+// ===== Mouse Interaction for Washing & Petting =====
+const bloodParticles = [];
+function createBlood(pos) {
+    for (let i = 0; i < 15; i++) {
+        const g = new THREE.SphereGeometry(0.02 + Math.random() * 0.03, 6, 4);
+        const m = new THREE.Mesh(g, mat.blood);
+        m.position.copy(pos);
+        scene.add(m);
+        bloodParticles.push({
+            mesh: m,
+            velocity: new THREE.Vector3((Math.random() - 0.5) * 0.2, (Math.random() - 0.5) * 0.2, (Math.random() - 0.5) * 0.2),
+            life: 1.0
+        });
+    }
+}
+
+window.addEventListener('mousedown', (event) => {
+    isDragging = true;
+    handIcon.style.transform = 'translate(-50%, -50%) scale(0.8)';
+
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObject(opossum, true);
+
+    if (intersects.length > 0) {
+        const obj = intersects[0].object;
+        if (obj.userData.type === 'head') {
+            // Bite!
+            showReaction('bite');
+            createBlood(new THREE.Vector3().setFromMatrixPosition(obj.matrixWorld));
+        } else {
+            showReaction('pet');
+        }
+    }
+});
+
+window.addEventListener('mouseup', () => {
+    isDragging = false;
+    handIcon.style.transform = 'translate(-50%, -50%) scale(1)';
+});
+
+window.addEventListener('mousemove', (event) => {
+    handIcon.style.left = event.clientX + 'px';
+    handIcon.style.top = event.clientY + 'px';
+    handIcon.style.display = 'block';
+
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    if (isDragging) {
+        raycaster.setFromCamera(mouse, camera);
+        const intersects = raycaster.intersectObject(opossum, true);
+        if (intersects.length > 0) {
+            if (currentScene === 'bathroom') {
+                createBubble();
+            } else {
+                if (Math.random() > 0.98) showReaction('pet');
+            }
+        }
+    }
+});
+
+opossumReactions['bite'] = ['*아드득*', '*와그작*', '*까드득*'];
+opossumReactions['pet'] = ['기분 좋아~ 찍찍', '더 문질러줘!', '쓰담쓰담 조아...'];
+
+animate();
+console.log("Three.js main.js finished and animation loop started.");
